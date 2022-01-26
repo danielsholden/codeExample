@@ -1,0 +1,66 @@
+import * as React from 'react';
+import cn from 'classnames';
+
+import { Colors, Modal } from '@ui/kit';
+
+import { welcomeContent } from './data/constants';
+import { isShowModal } from './data/services';
+
+import styles from './style.module.scss';
+
+const modalWidth = "350px";
+
+const WelcomeModal: React.FC = () => {
+  const [contentIdx, setContentIdx] = React.useState(0);
+  const [isOpenModal, setIsOpen] = React.useState(isShowModal());
+
+  const handleNext = (): void => {
+    const nextIdx = contentIdx + 1;
+    const nextContent = welcomeContent[nextIdx];
+    if (nextContent) {
+      setContentIdx(nextIdx);
+    } else {
+      setIsOpen(false);
+    }
+  };
+
+  const getClassName = (idx: number): string =>
+    cn(styles.dot, {
+      [styles.active]: contentIdx === idx,
+    });
+
+  const clickIndicator = (idx: number): void => setContentIdx(idx);
+
+  const content = welcomeContent[contentIdx];
+  return (
+    <Modal
+      customWidth={modalWidth}
+      modalClassName={styles.welcomeModal}
+      onClose
+      isOpen={isOpenModal}
+      backgroundColor={Colors.BlueMain}
+    >
+      <>
+        <div>
+          <img src={content.image} width="100%" alt="welcomeContent" />
+          <p className={styles.title}>{content.title}</p>
+        </div>
+        <div className={styles.content}>
+          <p className={styles.text}>{content.text}</p>
+          <div className={styles.buttons}>
+            <div className={styles.indicators}>
+              {welcomeContent.map((contend, index) => (
+                <span key={contend.uid} className={getClassName(index)} onClick={() => clickIndicator(index)} />
+              ))}
+            </div>
+            <button className={styles.btn} onClick={handleNext}>
+              {content.btnText}
+            </button>
+          </div>
+        </div>
+      </>
+    </Modal>
+  );
+};
+
+export default React.memo(WelcomeModal);
